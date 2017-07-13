@@ -1,0 +1,83 @@
+from luncher.meals.daos import MealDao
+from luncher.venues.daos import VenueDao, BaseDao
+from tests.integration_tests.base import BaseIntegrationTest
+from utils.content_type import ContentType
+from utils.status import *
+from utils.tests import QueriesCounter
+
+
+class MealsListEndpointTest(BaseIntegrationTest):
+    def test_status_ok(self):
+        response = self.client.get("/meals/")
+
+        assert response.status_code == HTTPStatus.HTTP_200_OK
+
+    def create_data(self):
+        kfc = VenueDao().create(name="KFC")
+        mcdonald = VenueDao().create(name="McDonald")
+
+        MealDao().create(name="Grander", venue=kfc)
+        MealDao().create(name="BigMac", venue=mcdonald)
+
+    def test_performance(self):
+        self.create_data()
+
+        with QueriesCounter(print_sql=True) as counter:
+
+            self.client.get("/meals/")
+
+            assert counter.count == 1
+
+
+class CreateMealEndpointTest(BaseIntegrationTest):
+    def test_unauthorized(self):
+        response = self.client.post("/meals/")
+
+        assert response.status_code == HTTPStatus.HTTP_401_UNAUTHORIZED
+
+    def test_created_with_success(self):
+        response = self.client.post(
+            "/meals/",
+            content_type=ContentType.APPLICATION_JSON,
+            data={
+                "name": "McFlurry",
+                "price": 1090,
+            }
+        )
+
+        assert response.status_code == HTTPStatus.HTTP_201_CREATED
+
+    def test_created_with_database_populate(self):
+        response = self.client.post(
+            "/meals/",
+            content_type=ContentType.APPLICATION_JSON,
+            data={
+                "name": "McFlurry",
+                "price": 1090,
+            }
+        )
+
+        assert MealDao().count()==1
+
+    def test_created_with_failure_missing_price(self):
+        response = self.client.post(
+            "/meals/",
+            content_type=ContentType.APPLICATION_JSON,
+            data={
+                "name": "McFlurry"
+            }
+        )
+
+        assert response.status_code == HTTPStatus.HTTP_400_BAD_REQUEST
+
+    def test_created_with_failure_missing_price_not_populate(self):
+        response = self.client.post(
+            "/meals/",
+            content_type=ContentType.APPLICATION_JSON,
+            data={
+                "name": "McFlurry",
+                "price": 1090,
+            }
+        )
+
+        assert MealDao().count()==0

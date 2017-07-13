@@ -1,0 +1,22 @@
+version: '2'
+services:
+
+  unit_tests:
+    build:
+      context: .
+    command: pytest tests/unit_tests
+
+  integration_tests:
+    build:
+      context: .
+    command: pytest tests/integration_tests
+
+  flakes_tests:
+    build:
+      context: .
+    command: pytest tests/ --flakes -m flakes
+
+  pep8_tests:
+    build:
+      context: .
+    command: pytest tests/ --pep8 -m pep8
