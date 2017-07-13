@@ -1,3 +1,5 @@
+from luncher.accounts.daos import UserDao
+from luncher.auth.helpers import TokenHelper
 from luncher.meals.daos import MealDao
 from luncher.venues.daos import VenueDao, BaseDao
 from tests.integration_tests.base import BaseIntegrationTest
@@ -35,10 +37,20 @@ class CreateMealEndpointTest(BaseIntegrationTest):
 
         assert response.status_code == HTTPStatus.HTTP_401_UNAUTHORIZED
 
+    def get_authorization_header(self):
+        user = UserDao().create(login="test", password="test")
+
+        return {
+            "Authorization": TokenHelper().create(user.id)
+        }
+
+
+
     def test_created_with_success(self):
         response = self.client.post(
             "/meals/",
             content_type=ContentType.APPLICATION_JSON,
+            headers=self.get_authorization_header(),
             data={
                 "name": "McFlurry",
                 "price": 1090,
@@ -47,10 +59,13 @@ class CreateMealEndpointTest(BaseIntegrationTest):
 
         assert response.status_code == HTTPStatus.HTTP_201_CREATED
 
+
+
     def test_created_with_database_populate(self):
         response = self.client.post(
             "/meals/",
             content_type=ContentType.APPLICATION_JSON,
+            headers=self.get_authorization_header(),
             data={
                 "name": "McFlurry",
                 "price": 1090,
@@ -63,6 +78,7 @@ class CreateMealEndpointTest(BaseIntegrationTest):
         response = self.client.post(
             "/meals/",
             content_type=ContentType.APPLICATION_JSON,
+            headers=self.get_authorization_header(),
             data={
                 "name": "McFlurry"
             }
@@ -74,6 +90,7 @@ class CreateMealEndpointTest(BaseIntegrationTest):
         response = self.client.post(
             "/meals/",
             content_type=ContentType.APPLICATION_JSON,
+            headers=self.get_authorization_header(),
             data={
                 "name": "McFlurry",
                 "price": 1090,
@@ -81,3 +98,17 @@ class CreateMealEndpointTest(BaseIntegrationTest):
         )
 
         assert MealDao().count()==0
+
+
+
+    def test_not_allowed(self):
+        response = self.client.post(
+            "/meals/",
+            content_type=ContentType.APPLICATION_JSON,
+            data={
+                "name": "McFlurry",
+                "price": 1090,
+            }
+        )
+
+        assert response.status_code == HTTPStatus.HTTP_401_UNAUTHORIZED
