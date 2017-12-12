@@ -1,4 +1,5 @@
-from flask import jsonify
+from json import dumps
+
 from flask.views import MethodView
 
 from luncher.meals.daos import MealDao
@@ -13,4 +14,4 @@ class MealListView(MethodView):
 
     def get(self):
         data, _ = self.serializer.dump(self.dao.all())
-        return jsonify(data), HTTPStatus.HTTP_200_OK
+        return dumps(data), HTTPStatus.HTTP_200_OK

@@ -1,3 +1,5 @@
+from json import dumps
+
 from luncher.accounts.daos import UserDao
 from luncher.auth.helpers import TokenHelper
 from luncher.meals.daos import MealDao
@@ -51,10 +53,10 @@ class CreateMealEndpointTest(BaseIntegrationTest):
             "/meals/",
             content_type=ContentType.APPLICATION_JSON,
             headers=self.get_authorization_header(),
-            data={
+            data=dumps({
                 "name": "McFlurry",
                 "price": 1090,
-            }
+            })
         )
 
         assert response.status_code == HTTPStatus.HTTP_201_CREATED
@@ -66,10 +68,10 @@ class CreateMealEndpointTest(BaseIntegrationTest):
             "/meals/",
             content_type=ContentType.APPLICATION_JSON,
             headers=self.get_authorization_header(),
-            data={
+            data=dumps({
                 "name": "McFlurry",
                 "price": 1090,
-            }
+            })
         )
 
         assert MealDao().count()==1
@@ -79,9 +81,9 @@ class CreateMealEndpointTest(BaseIntegrationTest):
             "/meals/",
             content_type=ContentType.APPLICATION_JSON,
             headers=self.get_authorization_header(),
-            data={
+            data=dumps({
                 "name": "McFlurry"
-            }
+            })
         )
 
         assert response.status_code == HTTPStatus.HTTP_400_BAD_REQUEST
@@ -91,10 +93,10 @@ class CreateMealEndpointTest(BaseIntegrationTest):
             "/meals/",
             content_type=ContentType.APPLICATION_JSON,
             headers=self.get_authorization_header(),
-            data={
+            data=dumps({
                 "name": "McFlurry",
                 "price": 1090,
-            }
+            })
         )
 
         assert MealDao().count()==0
@@ -105,10 +107,10 @@ class CreateMealEndpointTest(BaseIntegrationTest):
         response = self.client.post(
             "/meals/",
             content_type=ContentType.APPLICATION_JSON,
-            data={
+            data=dumps({
                 "name": "McFlurry",
                 "price": 1090,
-            }
+            })
         )
 
         assert response.status_code == HTTPStatus.HTTP_401_UNAUTHORIZED
