@@ -15,6 +15,7 @@ def create_app(config_object=Config):
     """
 
     app = Flask(__name__)
+    app.debug = True
     app.config.from_object(config_object)
     register_extensions(app)
     register_routes(app)
