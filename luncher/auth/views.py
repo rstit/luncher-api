@@ -1,12 +1,7 @@
 from flask import (
     current_app,
-    flash,
-    g,
-    redirect,
-    render_template,
     request,
     session,
-    url_for
 )
 from functools import wraps
 
@@ -20,6 +15,10 @@ from itsdangerous import TimestampSigner
 from utils.status import HTTPStatus
 
 
+class TokenAuthorizationError(Exception):
+    pass
+
+
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -28,7 +27,7 @@ def login_required(f):
             s = TimestampSigner(current_app.config.get('SECRET_KEY'))
             user_dict = s.unsign(token)
             user_id = ast.literal_eval(user_dict.decode())
-        except:
+        except TokenAuthorizationError:
             return '', HTTPStatus.HTTP_401_UNAUTHORIZED
         else:
             session['user_id'] = user_id
@@ -56,4 +55,5 @@ class TokenView(APIView):
             token = self.token_helper.create(user.id)
             return {"token": token}, HTTPStatus.HTTP_200_OK
 
-        return {"error": "Invalid Credentials"}, HTTPStatus.HTTP_400_BAD_REQUEST
+        return ({"error": "Invalid Credentials"},
+                HTTPStatus.HTTP_400_BAD_REQUEST)

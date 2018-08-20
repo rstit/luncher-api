@@ -1,8 +1,7 @@
 from luncher.extensions import db
 from utils.sqla.models import SurrogatePK
 
-from sqlalchemy import Column, ForeignKey, Integer, Table, String
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, String
 
 
 class Venue(db.Model, SurrogatePK):
