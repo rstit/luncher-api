@@ -1,7 +1,7 @@
 from luncher.extensions import db
 from utils.sqla.models import SurrogatePK
 
-from sqlalchemy import Column, ForeignKey, Integer, Table, String
+from sqlalchemy import Column, String
 
 
 class User(db.Model, SurrogatePK):

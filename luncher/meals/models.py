@@ -1,7 +1,7 @@
 from luncher.extensions import db
 from luncher.venues.models import Venue
 
-from sqlalchemy import Column, ForeignKey, Integer, Table, String
+from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
 from utils.sqla.models import SurrogatePK, ValueMixin

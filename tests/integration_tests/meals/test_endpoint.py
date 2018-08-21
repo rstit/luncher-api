@@ -3,10 +3,10 @@ from json import dumps
 from luncher.accounts.daos import UserDao
 from luncher.auth.helpers import TokenHelper
 from luncher.meals.daos import MealDao
-from luncher.venues.daos import VenueDao, BaseDao
+from luncher.venues.daos import VenueDao
 from tests.integration_tests.base import BaseIntegrationTest
 from utils.content_type import ContentType
-from utils.status import *
+from utils.status import HTTPStatus
 from utils.tests import QueriesCounter
 
 
@@ -46,25 +46,21 @@ class CreateMealEndpointTest(BaseIntegrationTest):
             "Authorization": TokenHelper().create(user.id)
         }
 
-
-
     def test_created_with_success(self):
         response = self.client.post(
             "/meals/",
             content_type=ContentType.APPLICATION_JSON,
             headers=self.get_authorization_header(),
             data=dumps({
-                "name": "McFlurry",
+                "name": "McFlurry2",
                 "price": 1090,
             })
         )
 
         assert response.status_code == HTTPStatus.HTTP_201_CREATED
 
-
-
     def test_created_with_database_populate(self):
-        response = self.client.post(
+        self.client.post(
             "/meals/",
             content_type=ContentType.APPLICATION_JSON,
             headers=self.get_authorization_header(),
@@ -74,7 +70,7 @@ class CreateMealEndpointTest(BaseIntegrationTest):
             })
         )
 
-        assert MealDao().count()==1
+        assert MealDao().count() == 1
 
     def test_created_with_failure_missing_price(self):
         response = self.client.post(
@@ -89,19 +85,16 @@ class CreateMealEndpointTest(BaseIntegrationTest):
         assert response.status_code == HTTPStatus.HTTP_400_BAD_REQUEST
 
     def test_created_with_failure_missing_price_not_populate(self):
-        response = self.client.post(
+        self.client.post(
             "/meals/",
             content_type=ContentType.APPLICATION_JSON,
             headers=self.get_authorization_header(),
             data=dumps({
                 "name": "McFlurry",
-                "price": 1090,
             })
         )
 
-        assert MealDao().count()==0
-
-
+        assert MealDao().count() == 0
 
     def test_not_allowed(self):
         response = self.client.post(
