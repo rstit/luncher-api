@@ -1,5 +1,4 @@
 from flask import (
-    current_app,
     request,
     session,
 )
@@ -11,7 +10,6 @@ from luncher.auth.helpers import TokenHelper
 from luncher.common import APIView
 
 import ast
-from itsdangerous import TimestampSigner
 from utils.status import HTTPStatus
 
 
@@ -22,12 +20,12 @@ class TokenAuthorizationError(Exception):
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
+        token_helper = TokenHelper()
         try:
             token = request.headers.get('Authorization')
-            s = TimestampSigner(current_app.config.get('SECRET_KEY'))
-            user_dict = s.unsign(token)
+            user_dict = token_helper.unsign(token)
             user_id = ast.literal_eval(user_dict.decode())
-        except TokenAuthorizationError:
+        except (TokenAuthorizationError, TypeError):
             return '', HTTPStatus.HTTP_401_UNAUTHORIZED
         else:
             session['user_id'] = user_id

@@ -34,7 +34,7 @@ class MealListView(MethodView):
         validated_data, errors = self.meal_serializer.loads(
             dumps(request.json))
         if errors:
-            return errors, HTTPStatus.HTTP_400_BAD_REQUEST
+            return dumps(errors), HTTPStatus.HTTP_400_BAD_REQUEST
 
         new_meal = self.dao.create(validated_data)
         return dumps({'new_meal_id': new_meal.id}), HTTPStatus.HTTP_201_CREATED
